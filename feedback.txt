@@ -1,0 +1,12 @@
+#separate input for edit -> choose not to. 
+#remove display all asset
+#some of forgot invalid input handling
+#add read & write from file 
+#msg uniform
+
+done before this point 26/6----------------------------------------------------------
+
+
+
+start with asset first, think about wrong input handling
+multiple user login
