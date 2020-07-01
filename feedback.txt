@@ -3,10 +3,10 @@
 #some of forgot invalid input handling
 #add read & write from file 
 #msg uniform
-
-done before this point 26/6----------------------------------------------------------
+multiple user login x2 
+done before this point 30/6----------------------------------------------------------
 
 
 
 start with asset first, think about wrong input handling
-multiple user login x2 
+

@@ -3,3 +3,26 @@
 wrong user
 wrong pw
 both wrong
+correct
+
+done: 
+1. practice: pointer to structs, array of structs, error handling 
+2. test input choice 1,2, invalid
+done----------------
+
+tasK
+assets manage page: 
+1,2,3delete asset only, 4, 5
+
+
+1. search  ID or name 
+input num -> convert string to num
+input char/string
+combined
+
+-test symbols
+-letters
+numbers
+
+1. view 
+
