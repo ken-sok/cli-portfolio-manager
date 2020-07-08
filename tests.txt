@@ -28,14 +28,10 @@ current insert situation: drop 1. to insert first
 ----------------------------------------------------
 insert 
 
-done: valid input all except name -> doing, testing using pointer to struct array & view ID, and others ->done
-
-
-
-
++ done: valid input all except name -> doing, testing using pointer to struct array & view ID, and others ->done
 -> d, m, y needs editing
 
-getline function? -> use this cuz getline also takes space
+
 
 loop to diplay all
 -------------------------------------------------------------
@@ -50,3 +46,4 @@ Use continue for errors, c++ validate text or int; Q: is dynamic array global or
 later: 
 --> input '8u' gives out bad input on input validation 
 -> day month year input 
+getline function for name? -> use this cuz getline also takes space
