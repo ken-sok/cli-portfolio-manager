@@ -40,10 +40,12 @@ void print_asset_manage_option();
 double get_valid_input(string try_again); 
 short get_valid_input(string try_again, short max_num); 
 void view_search(short choice, Asset* ptr_assets, int *count_asset); 
+void view_search_controller(Asset* ptr_assets, int *count_asset); 
 void insert_asset(Asset* ptr_assets, int *count_asset); 
 void print_one_asset(int ID, string name, double price, int quantity, int day, int month, int year); 
 void print_one_asset(int ID, string name, double price, int quantity, int day, int month, int year, short all); 
 void print_all_asset(Asset* ptr_assets, int *count_asset); 
+
 //global constants
 const string LINES = "------------------------------------------------------------------------------\n"; 
 const string INVALID_MSG = "Invalid Input. Please try again.\n"; 
@@ -59,7 +61,7 @@ int main()
     if (log){
         //cout << "Welcome to Portfolio Management System" << endl;
         asset_page_choice = assets_manage(); 
-        cout << "chose" << asset_page_choice; 
+        //cout << "chose" << asset_page_choice; 
     }
 
     return 0; 
@@ -120,7 +122,7 @@ int assets_manage(){
     //insert Asset works, need valid input
     //var declaration 
     short option; 
-    short sub_option; 
+    
     const string TRY_AGAIN_ASSET = "Input Choice: "; 
     const int ASSET_QUANTITY_LIMIT = 50; 
     int count = 0; 
@@ -136,50 +138,32 @@ int assets_manage(){
         option = get_valid_input(TRY_AGAIN_ASSET); 
 
         //note cannot use switch case with sub option
+        //don't forget to break after each case
         switch (option)
         {
         //view or search
-        case 1:
-            { 
-                cout << LINES; 
-                cout << "Do you want to search ( type '1' ) or view all assets ( type '2') ?" << endl;
-                
-                while (true){
-                    //invalid input handling
-                    sub_option = get_valid_input(TRY_AGAIN_ASSET); 
-                    //search
-                    if (sub_option == 1){
-                        view_search(1,ptr_assets, asset_count); 
-                        break; 
-                    }
-                    //view 
-                    else if (sub_option == 2){
-                        view_search(2,ptr_assets, asset_count); 
-                        break; 
-                    } else {
-                        cout << endl << INVALID_MSG << LINES; 
-                        continue; 
-                    }
-                    break;
-
+            case 1:
+                { 
+                    view_search_controller(ptr_assets, asset_count);
+                    break; 
                 }
-            }
-        //add new asset
-        case 2: 
-            {
-                cout << LINES; 
-                insert_asset(ptr_assets, asset_count); 
-                break;
-            }
+            //add new asset
+            
+            case 2: 
+                {
+                    cout << LINES; 
+                    insert_asset(ptr_assets, asset_count); 
+                    break;
+                }
             
 
             
             
         
-        default:
-            { 
-                cout << endl <<  INVALID_MSG << LINES; 
-            } 
+            default:
+                { 
+                    cout << endl <<  INVALID_MSG << LINES; 
+                } 
         }
     } while (option != 6);
 
@@ -204,6 +188,35 @@ void print_asset_manage_option(){
 /**********************************************MANAGE ASSETS********************************************************/
 
 /**********************************************VIEW/SEARCH ASSETS********************************************************/
+
+
+
+void view_search_controller(Asset* ptr_assets, int *count_asset){
+    short sub_option; 
+    cout << LINES; 
+    cout << "Do you want to search ( type '1' ) or view all assets ( type '2') ?" << endl;
+    
+    const string TRY_AGAIN_ASSET = "Input Choice: ";
+    while (true){
+        //invalid input handling
+        sub_option = get_valid_input(TRY_AGAIN_ASSET); 
+        //search
+        if (sub_option == 1){
+            view_search(1,ptr_assets, count_asset); 
+            break; 
+        }
+        //view 
+        else if (sub_option == 2){
+            view_search(2,ptr_assets, count_asset); 
+            break; 
+        } else {
+            cout << endl << INVALID_MSG << LINES; 
+            continue; 
+        }
+        break;
+
+    }
+}
 void view_search(short choice, Asset* ptr_assets, int *count_asset){
 
     string query; 
@@ -231,7 +244,7 @@ void view_search(short choice, Asset* ptr_assets, int *count_asset){
 
     //view 
     else if (choice == 2){
-        cout << "viewwww"; 
+        //cout << "viewwww"; 
         print_all_asset(ptr_assets, count_asset); 
     }
 
@@ -317,6 +330,12 @@ double get_valid_input(string try_again)
             cout << endl << INVALID_MSG << LINES; 
             continue;                // try again
         }
+
+        if (choice <= 0) {
+            cout << endl << INVALID_MSG << LINES; 
+            continue; 
+        }
+
         break; 
 
     }
@@ -338,7 +357,7 @@ short get_valid_input(string try_again, short max_num)
             continue;                // try again
         }
 
-        if (choice > max_num) {
+        if (choice > max_num or choice <= 0) {
             cout << endl << INVALID_MSG << LINES; 
             continue; 
         }
@@ -364,33 +383,21 @@ void print_one_asset(int ID, string name, double price, int quantity, int day, i
     cout << LINES; 
 
 }
-void print_one_asset(int ID, string name, double price, int quantity, int day, int month, int year){
-    
-    //can be used to print 1 asset for delte
-     
-    cout << LINES; 
-    cout << ASSET_COL_NAMES; 
-    cout << endl; 
-    cout << ID << "\t" << name << "\t\t\t" << price << "\t\t" << quantity << "\t\t" << day << "/" << month << "/"<< year ; 
-    cout << endl;
-    cout << LINES; 
 
-}
 
 void print_one_asset(int ID, string name, double price, int quantity, int day, int month, int year, short all){
     
     //can be used to print 1 asset for delte
-     
-    cout << LINES; 
-    cout << ASSET_COL_NAMES; 
     cout << endl; 
-    cout << ID << "\t" << name << "\t\t\t" << price << "\t\t" << quantity << "\t\t" << day << "/" << month << "/"<< year ; 
-    
+    cout << ID << "\t" << name << "\t\t\t" << price << "\t\t" << quantity << "\t\t" << day << "/" << month << "/"<< year;
 
 }
 
 void print_all_asset(Asset* ptr_assets, int *count_asset){
 
+    //headings
+    cout << LINES; 
+    cout << ASSET_COL_NAMES; 
     for (int i = 0; i < *count_asset; i++){
         //output 
         int new_ID = (ptr_assets[i]).ID;
@@ -402,8 +409,10 @@ void print_all_asset(Asset* ptr_assets, int *count_asset){
         int year = (ptr_assets[i]).date.year;
         print_one_asset(new_ID, name, price, quantity, day, month, year, 1); 
     }
+    //ending lines
     cout << endl;
-    cout << LINES; 
+    cout << LINES;
+     
 }
 
 /************************************************HELPER FUNCTIONS****************************************************/

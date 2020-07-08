@@ -12,31 +12,37 @@ assets manage page:
 1,2,3delete asset only, 4, 5
 
 --------------------------------------------------
+done: 
+1. practice: pointer to structs, array of structs, error handling 
+2. test input choice 1,2, invalid
+- case problem when type number 2 -> forgot break
+- modify print 1 asset
+- test date -1, 0 
+- view all option 
+
+
+
+working on: 
 1. search  ID or name 
 input num -> convert string to num
 input char/string
 combined
 
-1. view 
 
-done: 
-1. practice: pointer to structs, array of structs, error handling 
-2. test input choice 1,2, invalid
 
-current insert situation: drop 1. to insert first
+
+
+
 
 ----------------------------------------------------
-insert 
+2. insert DONE 
 
 + done: valid input all except name -> doing, testing using pointer to struct array & view ID, and others ->done
 -> d, m, y needs editing
 
-
-
-loop to diplay all
 -------------------------------------------------------------
-note: should focus on core functions first before making it perfect all round
-Use continue for errors, c++ validate text or int; Q: is dynamic array global or local; cin.fail() w/ isdigit
+note: should focus on core functions first before making it perfect all round 
+
 
 
 
