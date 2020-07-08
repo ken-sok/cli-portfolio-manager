@@ -27,7 +27,7 @@ struct Asset
 {
     int ID; 
     string name; 
-    int price; 
+    double price; 
     int quantity; 
     Date date; 
 };
@@ -37,13 +37,17 @@ struct Asset
 bool login(); 
 int assets_manage(); 
 void print_asset_manage_option(); 
-short get_valid_input(string try_again); 
+double get_valid_input(string try_again); 
+short get_valid_input(string try_again, short max_num); 
 void view_search(short choice); 
-void insert_asset(Asset *ptr_assets, int *count_asset); 
+void insert_asset(Asset* ptr_assets, int *count_asset); 
+void print_new_asset(int ID, string name, double price, int quantity, int day, int month, int year); 
+
 //global constants
 const string LINES = "------------------------------------------------------------------------------\n"; 
 const string INVALID_MSG = "Invalid Input. Please try again.\n"; 
-
+const string ASSET_COL_NAMES = "ID\tName\t\t\tPrice\t\tQuantity\tDate"; 
+const short MAX_YEAR_APP_USE = 2030; 
 int main()
 {   
     //variable declaration
@@ -60,7 +64,7 @@ int main()
     return 0; 
 
 }
-
+/**********************************************LOGIN*****************************************************************/
 bool login(){
 
     //Variable declaration
@@ -106,8 +110,9 @@ bool login(){
     return true; 
 
 }
+/**********************************************LOGIN*****************************************************************/
 
-
+/**********************************************MANAGE ASSETS********************************************************/
 int assets_manage(){
     
     
@@ -117,10 +122,10 @@ int assets_manage(){
     short sub_option; 
     const string TRY_AGAIN_ASSET = "Input Choice: "; 
     const int ASSET_QUANTITY_LIMIT = 50; 
-    int *asset_count = 0;  
+    int count = 0; 
+    int *asset_count = &count;  
     Asset *ptr_assets, all_assets[ASSET_QUANTITY_LIMIT]; 
-    ptr_assets = &all_assets; 
-
+    ptr_assets = all_assets; 
     do
     {
         
@@ -131,44 +136,72 @@ int assets_manage(){
 
         switch (option)
         {
+        //view or search
         case 1:
-            cout << LINES; 
-            cout << "Do you want to search ( type '1' ) or view all assets ( type '2') ?" << endl;
-            
-            while (true){
-                //invalid input handling
-                sub_option = get_valid_input(TRY_AGAIN_ASSET); 
-                //search
-                if (sub_option == 1){
-                    view_search(1); 
-                    break; 
-                }
-                //view 
-                else if (sub_option == 2){
-                    view_search(2); 
-                    break; 
-                } else {
-                    cout << endl << INVALID_MSG << LINES; 
-                    continue; 
-                }
+            { 
+                cout << LINES; 
+                cout << "Do you want to search ( type '1' ) or view all assets ( type '2') ?" << endl;
+                
+                while (true){
+                    //invalid input handling
+                    sub_option = get_valid_input(TRY_AGAIN_ASSET); 
+                    //search
+                    if (sub_option == 1){
+                        view_search(1); 
+                        break; 
+                    }
+                    //view 
+                    else if (sub_option == 2){
+                        view_search(2); 
+                        break; 
+                    } else {
+                        cout << endl << INVALID_MSG << LINES; 
+                        continue; 
+                    }
+                    break;
 
+                }
             }
+        //add new asset
         case 2: 
-            insert_asset(ptr_assets, count_asset)
-            
+            {
+                cout << LINES; 
+                insert_asset(ptr_assets, asset_count); 
+                break;
+            }
             
 
             
-            break;
+            
         
         default:
-            cout << endl <<  INVALID_MSG << LINES; 
+            { 
+                cout << endl <<  INVALID_MSG << LINES; 
+            } 
         }
     } while (option != 6);
 
     return option; 
 }
 
+
+void print_asset_manage_option(){
+    cout << LINES; 
+    cout << "\nAssets Management\n\n";
+
+    cout << "1. View all/ Search assets " << endl;
+    cout << "2. Add new asset " << endl;
+    cout << "3. Delete asset/portfolio " << endl;
+    cout << "4. Edit asset " << endl;
+    cout << "5. Sort assets " << endl;
+    cout << "6. Return to Main Page " << endl;
+    cout << "7. Read/ Write from file " << endl;
+
+    cout << "Please type in number 1-7 according to your preferences. ";
+}
+/**********************************************MANAGE ASSETS********************************************************/
+
+/**********************************************VIEW/SEARCH ASSETS********************************************************/
 void view_search(short choice){
 
     string query; 
@@ -200,9 +233,92 @@ void view_search(short choice){
     }
 
 }
+/**********************************************VIEW/SEARCH ASSETS********************************************************/
+
+/************************************************INSERT ASSET***********************************************************/
+
+void insert_asset(Asset* ptr_assets, int *count_asset){
+
+    //var declaration
+   
+    static int ID = 1;
+    const string ASK_PRICE= "Enter Asset price: "; 
+    const string ASK_QUANTITY= "Enter Asset purchase quantity: "; 
+    const string ASK_DAY= "Enter Asset purchase day: "; 
+    const string ASK_MONTH= "Enter Asset purchase month: "; 
+    const string ASK_YEAR= "Enter Asset purchase year: "; 
+
+    cout << "Please type in new asset details below." << endl;
+    ptr_assets[*count_asset].ID = ID;
+    cout << "ID = " << ID << endl; 
+    cout << "\nEnter Asset name: ";
+    cin >> ptr_assets[*count_asset].name;
+    
+    
+    ptr_assets[*count_asset].price = get_valid_input(ASK_PRICE);
+    ptr_assets[*count_asset].quantity = get_valid_input(ASK_QUANTITY);  
 
 
-short get_valid_input(string try_again)
+    
+    ptr_assets[*count_asset].date.day = get_valid_input(ASK_DAY, 31);  
+    ptr_assets[*count_asset].date.month = get_valid_input(ASK_MONTH, 12);  
+    ptr_assets[*count_asset].date.year = get_valid_input(ASK_YEAR, MAX_YEAR_APP_USE);  
+    
+    //cin >> (ptr_assets[*count_asset]).quantity; 
+    
+    //cin >> (ptr_assets[*count_asset]).date.day;
+     
+    //cin >> (ptr_assets[*count_asset]).date.month;
+    
+    //cin >> (ptr_assets[*count_asset]).date.year;
+    
+    //output 
+    int new_ID = (ptr_assets[*count_asset]).ID;
+    string name = (ptr_assets[*count_asset]).name;
+    double price = (ptr_assets[*count_asset]).price;
+    int quantity = (ptr_assets[*count_asset]).quantity; 
+    int day = (ptr_assets[*count_asset]).date.day;
+    int month = (ptr_assets[*count_asset]).date.month;
+    int year = (ptr_assets[*count_asset]).date.year;
+    
+    print_new_asset(new_ID, name, price, quantity, day, month, year); 
+    //increase asset index by 1
+    *count_asset +=1; 
+    //auto increment ID
+    ID++; 
+}
+
+
+/************************************************INSERT ASSET***********************************************************/
+
+
+
+/************************************************HELPER FUNCTIONS****************************************************/ 
+
+
+double get_valid_input(string try_again)
+{
+    //handles wrong input type, letters before numbers, numbers over 32767
+    //caveat: numbers before letters will take the numbers in front 
+    double choice;
+    while (true)
+    {
+        cout << endl << try_again;  
+        cin >> choice;
+        if (cin.fail()) // handle wrong input type
+        {
+            cin.clear();             // reset the state bits back to goodbit so we can use ignore()
+            cin.ignore(32767, '\n'); // clear out the bad input from the stream
+            cout << endl << INVALID_MSG << LINES; 
+            continue;                // try again
+        }
+        break; 
+
+    }
+    return choice;
+}
+
+short get_valid_input(string try_again, short max_num)
 {
     short choice;
     while (true)
@@ -216,57 +332,32 @@ short get_valid_input(string try_again)
             cout << endl << INVALID_MSG << LINES; 
             continue;                // try again
         }
+
+        if (choice > max_num) {
+            cout << endl << INVALID_MSG << LINES; 
+            continue; 
+        }
         break; 
+        
+
 
     }
+
+    
     return choice;
 }
 
-void print_asset_manage_option(){
+void print_new_asset(int ID, string name, double price, int quantity, int day, int month, int year){
+    
+    //can be used to print 1 asset for delte
+    cout << "\nnew asset added:\n"; 
     cout << LINES; 
-    cout << "\nAssets Management\n\n";
+    cout << ASSET_COL_NAMES; 
+    cout << endl; 
+    cout << ID << "\t" << name << "\t\t\t" << price << "\t\t" << quantity << "\t\t" << day << "/" << month << "/"<< year ; 
+    cout << endl;
+    cout << LINES; 
 
-    cout << "1. View all/ Search assets " << endl;
-    cout << "2. Add new asset " << endl;
-    cout << "3. Delete asset/portfolio " << endl;
-    cout << "4. Edit asset " << endl;
-    cout << "5. Sort assets " << endl;
-    cout << "6. Return to Main Page " << endl;
-    cout << "7. Read/ Write from file " << endl;
-
-    cout << "Please type in number 1-7 according to your preferences. ";
 }
 
-void insert_asset(Asset *ptr_assets, int *count_asset){
-
-    
-    static int ID = 1; 
-    *ptr_assets[*count_asset]).ID = ID; 
-
-    cout << "Enter Asset name: "; 
-    cin >> (ptr_assets[*count_asset]).name;
-    cout << "Enter Asset price: "; 
-    cin >> (ptr_assets[*count_asset]).price;
-    cout << "Enter Asset purchase quantity: "; 
-    cin >> (ptr_assets[*count_asset]).quantity; 
-    cout << "Enter Asset purchase day: ";
-    cin >> (ptr_assets[*count_asset]).date.day;
-    cout << "Enter Asset purchase month: ";  
-    cin >> (ptr_assets[*count_asset]).date.month;
-    cout << "Enter Asset purchase year: "; 
-    cin >> (*ptr_assets[*count_asset]).date.year;
-    
-    //output 
-    cout << (ptr_assets[*count_asset]).ID;
-    cout << (ptr_assets[*count_asset]).name;
-    cout << (ptr_assets[*count_asset]).price;
-    cout << (ptr_assets[*count_asset]).quantity; 
-    cout << (ptr_assets[*count_asset]).date.day;
-    cout << (ptr_assets[*count_asset]).date.month;
-    cout << (ptr_assets[*count_asset]).date.year;
-    
-    //increase asset index by 1
-    *count_asset +=1; 
-    //auto increment ID
-    ID++; 
-}
+/************************************************HELPER FUNCTIONS****************************************************/
