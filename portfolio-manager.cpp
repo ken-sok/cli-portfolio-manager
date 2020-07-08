@@ -357,7 +357,7 @@ short get_valid_input(string try_again, short max_num)
             continue;                // try again
         }
 
-        if (choice > max_num or choice <= 0) {
+        if ((choice > max_num) || (choice <= 0)) {
             cout << endl << INVALID_MSG << LINES; 
             continue; 
         }
