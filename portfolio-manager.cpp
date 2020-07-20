@@ -51,7 +51,7 @@ int assets_manage();
 void print_asset_manage_option(); 
 double get_valid_input(short try_again); 
 short get_valid_input(short try_again, short max_num); 
-void view_search(short choice, Asset* ptr_assets, int &count_asset); 
+void search_asset(Asset* ptr_assets, int &count_asset); 
 void view_search_controller(Asset* ptr_assets, int &count_asset); 
 void insert_asset(Asset* ptr_assets, int &count_asset); 
 void print_one_asset(Asset* ptr_assets, int found_index);  
@@ -168,8 +168,7 @@ int assets_manage(){
 
     
     //var declaration 
-    short option; 
-    //const string TRY_AGAIN_ASSET = "\nInput Choice: "; 
+    short option;  
     const int ASSET_QUANTITY_LIMIT = 50; 
     int count = 0; 
     int &asset_count = count;  
@@ -259,14 +258,17 @@ int assets_manage(){
 
 
 void print_asset_manage_option(){
+    
+    //this function prints all options user can choose to complete tasks
+
     cout << LINES; 
-    cout << "\nAssets Management\n\n";
+    cout << "\n-----ASSETS MANAGEMENT-----\n\n";
     cout << "1. Add new asset" << endl;
     cout << "2. View all/ Search asset" << endl;
     cout << "3. Delete asset" << endl;
     cout << "4. Edit asset" << endl;
     cout << "5. Sort assets" << endl;
-    cout << "6. Read/ Write to file" << endl;
+    cout << "6. Save/ Load from file" << endl;
     cout << "7. Exit application" << endl;
 
     cout << "Please type in number 1-7 according to your preferences. ";
@@ -282,10 +284,9 @@ void view_search_controller(Asset* ptr_assets, int &count_asset){
     //this function controls the flow of view/search function of the program 
 
     //var declaration
-    //const string TRY_AGAIN_ASSET = "\nInput Choice: ";
     short sub_option; 
     cout << LINES; 
-    cout << "Do you want to search ( type '1' ) or view all assets ( type '2' ) ?" << endl;
+    cout << "Do you want to search (Type '1') or view all assets (Type '2') ?" << endl;
     
     
     while (true){
@@ -293,15 +294,15 @@ void view_search_controller(Asset* ptr_assets, int &count_asset){
         
         sub_option = get_valid_input(TRY_AGAIN_ASSET); 
         
-        //search option
+        //search an asset
         if (sub_option == 1){
-            view_search(1,ptr_assets, count_asset); 
+            search_asset(ptr_assets, count_asset); 
             break; 
         }
 
-        //view option
+        //view alll assets
         else if (sub_option == 2){
-            view_search(2,ptr_assets, count_asset); 
+            print_all_asset(ptr_assets, count_asset);
             break; 
         } else {
             cout << endl << INVALID_MSG << LINES; 
@@ -311,65 +312,52 @@ void view_search_controller(Asset* ptr_assets, int &count_asset){
 
     }
 }
-void view_search(short choice, Asset* ptr_assets, int &count_asset){
+void search_asset(Asset* ptr_assets, int &count_asset){
 
-    //this function can search according to user input and shows all assets recorded
+    //this function can search according to user input 
 
     string query; 
     short found_index = -1; 
 
     //search
-    if (choice == 1){
-        cout << "Please type in ID or Name of asset:"; 
-        cin >> query; 
-       
-        //check asset IDs first if query is numeric
-        if (isNumeric(query)){
-            found_index = binarySearch(ptr_assets, stoi(query), 0, count_asset); 
-            if (found_index != -1){
-                cout << "Asset ID found!\n";
-            }
-                
-        }
-        
-        //check asset names if alphanumeric or numeric query not found in IDs
-        if (found_index == -1) {
-            
-            //do linear search of names
-            for (int i = 0; i<count_asset; i++){
-                if (ptr_assets[i].name == query){
-                    found_index = i; 
-                    cout << "Asset Name found!\n";
-                    break; 
-                }
-            }
-        }
-
-        //if asset found 
+    
+    cout << "Please type in ID or Name of asset: "; 
+    cin >> query; 
+    
+    //check asset IDs first if query is numeric
+    if (isNumeric(query)){
+        found_index = binarySearch(ptr_assets, stoi(query), 0, count_asset); 
         if (found_index != -1){
-
-            //print asset details    
-            cout << "\nThis is the asset you looked for:\n";
-            print_one_asset(ptr_assets, found_index);
-            
-
-        //if asset not found    
-        } else {
-            cout << "\nAsset not found.\n"; 
+            cout << "Asset ID found!\n";
         }
-        
-        
             
-    }    
+    }
+    
+    //check asset names if alphanumeric or numeric query not found in IDs
+    if (found_index == -1) {
         
-
-    //view all assets
-    else if (choice == 2){
-        
-        print_all_asset(ptr_assets, count_asset);
-        
+        //do linear search of names
+        for (int i = 0; i<count_asset; i++){
+            if (ptr_assets[i].name == query){
+                found_index = i; 
+                cout << "Asset Name found!\n";
+                break; 
+            }
+        }
     }
 
+    //if asset found 
+    if (found_index != -1){
+
+        //print asset details    
+        cout << "\nThis is the asset you looked for:\n";
+        print_one_asset(ptr_assets, found_index);
+        
+
+    //if asset not found    
+    } else {
+        cout << "\nAsset not found.\n"; 
+    }
 }
 /**********************************************VIEW/SEARCH ASSETS********************************************************/
 
@@ -382,14 +370,6 @@ void insert_asset(Asset* ptr_assets, int &count_asset){
     //var declaration
    
     static int ID = count_asset + 1;
-    /*
-    const string ASK_PRICE= "Enter NEW Asset price: "; 
-    const string ASK_QUANTITY= "Enter NEW Asset purchase quantity: "; 
-    const string ASK_DAY= "Enter NEW Asset purchase day: "; 
-    const string ASK_MONTH= "Enter NEW Asset purchase month: "; 
-    const string ASK_YEAR= "Enter NEW Asset purchase year: "; 
-    */ 
-
 
     //get user input for asset details
     cout << "Please type in new asset details below." << endl;
@@ -405,7 +385,7 @@ void insert_asset(Asset* ptr_assets, int &count_asset){
     
     
     //output to user for confirmation
-    cout << "\nnew asset added:\n";
+    cout << "\n---NEW ASSET ADDDED---\n";
     print_one_asset(ptr_assets, count_asset); 
 
     
@@ -434,8 +414,9 @@ int delete_asset_controller(Asset* ptr_assets, int &count_asset){
 
     while (true)
     {
-        cout << "\nPlease Enter ID of asset to delete:"; 
+        cout << "\nPlease Enter ID of asset to delete: "; 
         cin >> query; 
+
         //check ID if query is numeric
         if (isNumeric(query)){
             
@@ -452,14 +433,12 @@ int delete_asset_controller(Asset* ptr_assets, int &count_asset){
                 if (check_ans == 'Y'){
         
                     //print asset details
-            
-                    
                     deleted = delete_asset(ptr_assets, count_asset, found_index); 
 
                     if (deleted){
-                        cout << "Asset deleted.\n"; 
+                        cout << "---ASSET DELETED---.\n"; 
                     } else {
-                        cout << "Asset NOT deleted.\n"; 
+                        cout << "---Asset NOT deleted---.\n"; 
                     }
                     return 0; 
                             
@@ -477,7 +456,7 @@ int delete_asset_controller(Asset* ptr_assets, int &count_asset){
                 
             }
 
-        //input handling when user input is not numeric, ID is numeric-only        
+        //input handling when user input is not numeric; ID is numeric-only        
         } else {
             cout << "Invalid ID entered. Please try again. \n"; 
              
@@ -529,10 +508,12 @@ void update_asset_controller(Asset* ptr_assets, int &count_asset){
     //var declaration
     string query; 
     int found_index = -1; 
-    //get ID 
+
+    
     while (true)
     {
-        cout << "\nPlease Enter ID of asset to update:"; 
+        //get ID 
+        cout << "\nPlease Enter ID of asset to update: "; 
         cin >> query; 
 
         //check ID if query is numeric
@@ -561,10 +542,7 @@ void update_asset(Asset* ptr_assets, int &count_asset, int found_index){
 
     //this function allows user to update one asset according to the index specified in its controller function
 
-    //var declaration
-    ////////////////////////////////////////////////////////////////////////////////////////consider enum
-
-
+    
     //get user input
     cout << "Please type in new asset details below." << endl;
     cout << "ID = " << ptr_assets[found_index].ID << endl; 
@@ -578,7 +556,7 @@ void update_asset(Asset* ptr_assets, int &count_asset, int found_index){
     
     
     //output to user for confirmation
-    cout << "\nAsset updated:\n";
+    cout << "\n---ASSET UPDATED---\n";
     print_one_asset(ptr_assets, found_index); 
 
     
@@ -592,10 +570,10 @@ void update_asset(Asset* ptr_assets, int &count_asset, int found_index){
 void sort_controller(Asset* ptr_assets, int &count_asset){
 
     //var declaration
-    //const string TRY_AGAIN_ASSET = "\nInput Choice: ";
+    
     short sub_option; 
     cout << LINES; 
-    cout << "Do you want to sort by Name(Type '1') or Price (Type '2') ? " << endl;
+    cout << "Do you want to sort by Name (Type '1') or Price (Type '2') ? " << endl;
     
     
     while (true){
@@ -630,10 +608,10 @@ void sort_name_controller(Asset* ptr_assets, int &count_asset){
 
     string temp; 
     short swapped = 0; 
-    //sort according to name
 
+    //sort according to name
     insertion_sort(ptr_assets, count_asset, 0); 
-    cout << "\nSorted names alphabetically !\n"; 
+    cout << "\n---NAMES SORTED ALPHABETICALLY!---\n"; 
     print_all_asset(ptr_assets, count_asset); 
 
     
@@ -645,10 +623,10 @@ void sort_prices_controller(Asset* ptr_assets, int &count_asset){
     //this function sorts assets according to their prices
 
     //var declaration
-    //const string TRY_AGAIN_ASSET = "\nInput Choice: ";
+    
     short sub_option; 
     cout << LINES; 
-    cout << "Do you want to sort ascending or descending prices? Type '1' for ascending, or '2' or descending: " << endl;
+    cout << "Do you want to sort prices ascending (Type '1') or descending (Type '2') ?: " << endl;
     
     
     while (true){
@@ -677,17 +655,19 @@ void sort_prices_controller(Asset* ptr_assets, int &count_asset){
 
 void sort_prices(short choice, Asset* ptr_assets, int &count_asset){
 
+    //this function is controller for sorting prices 
+
     short swapped = 0; 
     if (choice == 1){
        
         insertion_sort(ptr_assets, count_asset, 1); 
-        cout << "\nPrices sorted ascending: \n"; 
+        cout << "\n---PRICES SORTED ASCENDING---\n"; 
     }
     
     else if (choice == 2){
 
        insertion_sort(ptr_assets, count_asset, 2); 
-       cout << "\nPrices sorted descending: \n"; 
+       cout << "\n---PRICE SORTED DESCENDING---\n"; 
     }
 
 
@@ -702,10 +682,10 @@ void sort_prices(short choice, Asset* ptr_assets, int &count_asset){
 
 void file_controller(Asset* ptr_assets, int &count_asset){
 
-     //this function sorts assets according to their prices
+    //this function is controller for writing data to file/reading data from file 
 
     //var declaration
-    //const string TRY_AGAIN_ASSET = "\nInput Choice: ";
+   
     short sub_option; 
     cout << LINES; 
     cout << "Do you want to save to file (Type '1') or load from file ('Type 2')? : " << endl;
@@ -741,8 +721,10 @@ void file_controller(Asset* ptr_assets, int &count_asset){
     
 }
 void save_asset_file(Asset* ptr_assets, int &count_asset) {
-    fstream file;
 
+    //this function saves all assets data to file 
+
+    fstream file;
     file.open("AssetsData.bin", ios::out | ios::binary );  
     if (file.good()) {      
         for (int i = 0; i < count_asset; i++) {
@@ -752,18 +734,20 @@ void save_asset_file(Asset* ptr_assets, int &count_asset) {
 
         }
         
-        cout << "\n\t\t\t\t==Saved to file Successfully!==" << endl;
+        cout << "---Saved to file Successfully---" << endl;
         file.close();
     }
     else {
         
-        cout << "\n\t\t\t\t==FAILED saving to file==" << endl;
+        cout << "---FAILED saving to file---" << endl;
     }
 
 }
 
 
 void load_asset_file(Asset* ptr_assets, int &count_asset) {
+
+    //this function loads all assets data from file 
     fstream file;
     Asset asset;
     file.open("AssetsData.bin", ios::in | ios::binary);
@@ -775,11 +759,11 @@ void load_asset_file(Asset* ptr_assets, int &count_asset) {
             file.read((char*)&asset, sizeof(asset));
             count_asset++;
         }
-        cout << "\n\t\t\t\t==Loaded from file successfully!==" << endl;
+        cout << "---Loaded from file successfully!---" << endl;
         file.close();
     }
     else {
-        cout << "\n\t\t\t\t==FAILED loading from file.==" << endl;
+        cout << "---FAILED loading from file---" << endl;
     }
 }
 
@@ -790,6 +774,8 @@ void load_asset_file(Asset* ptr_assets, int &count_asset) {
 
 /************************************************HELPER FUNCTIONS****************************************************/ 
 void insertion_sort(Asset* ptr_assets, int &count_asset, int key){
+
+    //this functions utilises insertion sort algorithm to sort names, and prices
 
     short swapped = 0; 
     for(int i=1; i<count_asset; i++)
@@ -847,7 +833,11 @@ void insertion_sort(Asset* ptr_assets, int &count_asset, int key){
         }
 }
 void swap_asset_details(Asset* ptr_assets, int index){
+    
+    //this function acts as helper function to insertion sort to swap two assets' places 
+    //within all assets array
 
+    //var declaration
     double temp; 
     string temp_str; 
 
@@ -977,7 +967,7 @@ void print_all_asset(Asset* ptr_assets, int &count_asset){
     //this function prints all assets by taking pointer to assets and total number of assets
     
     //print headings
-    cout << "\nAll assets list\n"; 
+    cout << "\n---ALL ASSETS LIST---\n"; 
     cout << LINES; 
     cout << ASSET_COL_NAMES; 
 
@@ -1051,6 +1041,9 @@ bool isNumeric(string str) {
 
 string ask_user_update(short info_asked){
 
+    //this function returns a feedback message for users according to
+    //input needed by program to execute tasks
+
     if (info_asked == ASK_PRICE) {
         return "Enter NEW Asset price: "; 
     } else if (info_asked == ASK_QUANTITY) {
@@ -1072,6 +1065,7 @@ string ask_user_update(short info_asked){
 void ClearScreen()
 {
     //this function clears the screen after 'Enter' is pressed by user
+
     cout << "Press Enter key to continue..."; 
     cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
     cin.get();  // or getchar()
