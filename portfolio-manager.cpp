@@ -40,7 +40,8 @@ struct Asset
     Date date; 
 };
 
-
+enum asset_options { Add = 1, View_Search = 2, Delete = 3, Update = 4, Sort = 5, File_IO = 6, Exit = 7 };
+enum msg_user {ASK_PRICE, ASK_QUANTITY, ASK_DAY, ASK_MONTH, ASK_YEAR, TRY_AGAIN_ASSET }; 
 /**********************************************structs declaration**********************************************************/
 
 /**********************************************functions declaration**********************************************************/
@@ -48,8 +49,8 @@ struct Asset
 bool login(); 
 int assets_manage(); 
 void print_asset_manage_option(); 
-double get_valid_input(string try_again); 
-short get_valid_input(string try_again, short max_num); 
+double get_valid_input(short try_again); 
+short get_valid_input(short try_again, short max_num); 
 void view_search(short choice, Asset* ptr_assets, int &count_asset); 
 void view_search_controller(Asset* ptr_assets, int &count_asset); 
 void insert_asset(Asset* ptr_assets, int &count_asset); 
@@ -66,9 +67,11 @@ void sort_controller(Asset* ptr_assets, int &count_asset);
 void sort_name_controller(Asset* ptr_assets, int &count_asset); 
 void sort_prices_controller(Asset* ptr_assets, int &count_asset); 
 void sort_prices(short choice, Asset* ptr_assets, int &count_asset);
+void insertion_sort(Asset* ptr_assets, int &count_asset, int key); 
 void save_asset_file(Asset* ptr_assets, int &count_asset); 
 void load_asset_file(Asset* ptr_assets, int &count_asset); 
 void file_controller(Asset* ptr_assets, int &count_asset); 
+string ask_user_update(short info_asked); 
 void ClearScreen(); 
 /**********************************************functions declaration**********************************************************/
 
@@ -166,14 +169,13 @@ int assets_manage(){
     
     //var declaration 
     short option; 
-    const string TRY_AGAIN_ASSET = "\nInput Choice: "; 
+    //const string TRY_AGAIN_ASSET = "\nInput Choice: "; 
     const int ASSET_QUANTITY_LIMIT = 50; 
     int count = 0; 
     int &asset_count = count;  
     Asset *ptr_assets, all_assets[ASSET_QUANTITY_LIMIT]; 
     ptr_assets = all_assets; 
      
-
     
     do
     {
@@ -183,6 +185,7 @@ int assets_manage(){
         //get valid input for choice of function to use
         option = get_valid_input(TRY_AGAIN_ASSET); 
         
+
         
         switch (option)
         {
@@ -279,7 +282,7 @@ void view_search_controller(Asset* ptr_assets, int &count_asset){
     //this function controls the flow of view/search function of the program 
 
     //var declaration
-    const string TRY_AGAIN_ASSET = "\nInput Choice: ";
+    //const string TRY_AGAIN_ASSET = "\nInput Choice: ";
     short sub_option; 
     cout << LINES; 
     cout << "Do you want to search ( type '1' ) or view all assets ( type '2' ) ?" << endl;
@@ -379,11 +382,14 @@ void insert_asset(Asset* ptr_assets, int &count_asset){
     //var declaration
    
     static int ID = count_asset + 1;
-    const string ASK_PRICE= "Enter Asset price: "; 
-    const string ASK_QUANTITY= "Enter Asset purchase quantity: "; 
-    const string ASK_DAY= "Enter Asset purchase day: "; 
-    const string ASK_MONTH= "Enter Asset purchase month: "; 
-    const string ASK_YEAR= "Enter Asset purchase year: "; 
+    /*
+    const string ASK_PRICE= "Enter NEW Asset price: "; 
+    const string ASK_QUANTITY= "Enter NEW Asset purchase quantity: "; 
+    const string ASK_DAY= "Enter NEW Asset purchase day: "; 
+    const string ASK_MONTH= "Enter NEW Asset purchase month: "; 
+    const string ASK_YEAR= "Enter NEW Asset purchase year: "; 
+    */ 
+
 
     //get user input for asset details
     cout << "Please type in new asset details below." << endl;
@@ -405,6 +411,7 @@ void insert_asset(Asset* ptr_assets, int &count_asset){
     
     //increase asset index by 1
     count_asset +=1; 
+
     //auto increment ID
     ID++; 
 }
@@ -416,7 +423,7 @@ void insert_asset(Asset* ptr_assets, int &count_asset){
 
 int delete_asset_controller(Asset* ptr_assets, int &count_asset){
 
-    //this function controls the flow of program when user asks to delete an asset/portfolio
+    //this function controls the flow of program when user asks to delete an asset
 
     //var declaration
     string query;  
@@ -443,10 +450,9 @@ int delete_asset_controller(Asset* ptr_assets, int &count_asset){
                 check_ans = getchar();
                 check_ans = toupper(check_ans); 
                 if (check_ans == 'Y'){
-
-                    //draft comment:
+        
                     //print asset details
-                    //maybe try a function that you pass only the index, and the pointer to array instead to save memory? 
+            
                     
                     deleted = delete_asset(ptr_assets, count_asset, found_index); 
 
@@ -557,11 +563,7 @@ void update_asset(Asset* ptr_assets, int &count_asset, int found_index){
 
     //var declaration
     ////////////////////////////////////////////////////////////////////////////////////////consider enum
-    const string ASK_PRICE= "Enter NEW Asset price: "; 
-    const string ASK_QUANTITY= "Enter NEW Asset purchase quantity: "; 
-    const string ASK_DAY= "Enter NEW Asset purchase day: "; 
-    const string ASK_MONTH= "Enter NEW Asset purchase month: "; 
-    const string ASK_YEAR= "Enter NEW Asset purchase year: "; 
+
 
     //get user input
     cout << "Please type in new asset details below." << endl;
@@ -590,7 +592,7 @@ void update_asset(Asset* ptr_assets, int &count_asset, int found_index){
 void sort_controller(Asset* ptr_assets, int &count_asset){
 
     //var declaration
-    const string TRY_AGAIN_ASSET = "\nInput Choice: ";
+    //const string TRY_AGAIN_ASSET = "\nInput Choice: ";
     short sub_option; 
     cout << LINES; 
     cout << "Do you want to sort by Name(Type '1') or Price (Type '2') ? " << endl;
@@ -630,34 +632,7 @@ void sort_name_controller(Asset* ptr_assets, int &count_asset){
     short swapped = 0; 
     //sort according to name
 
-     //repeat the same process according to number of assets 
-    for(int i=1; i<count_asset; i++)
-	{   
-        swapped == 0; 
-
-		for(int j=1; j<count_asset; j++)
-		{   
-
-            //check if the name of the last name is alphabetically after the next name
-			if ((((ptr_assets[j-1]).name).compare((ptr_assets[j]).name))>0)
-			{   
-                //if true, swap between the two assets
-
-                
-                //other details
-                swap_asset_details(ptr_assets, j); 
-                swapped = 1; 
-			}
-
-           
-		}
-
-        //stop comparing when there are no swaps in the thing at any round.
-        if (swapped == 0){
-            break; 
-        }
-	}
-    
+    insertion_sort(ptr_assets, count_asset, 0); 
     cout << "\nSorted names alphabetically !\n"; 
     print_all_asset(ptr_assets, count_asset); 
 
@@ -670,7 +645,7 @@ void sort_prices_controller(Asset* ptr_assets, int &count_asset){
     //this function sorts assets according to their prices
 
     //var declaration
-    const string TRY_AGAIN_ASSET = "\nInput Choice: ";
+    //const string TRY_AGAIN_ASSET = "\nInput Choice: ";
     short sub_option; 
     cout << LINES; 
     cout << "Do you want to sort ascending or descending prices? Type '1' for ascending, or '2' or descending: " << endl;
@@ -705,63 +680,14 @@ void sort_prices(short choice, Asset* ptr_assets, int &count_asset){
     short swapped = 0; 
     if (choice == 1){
        
-        //repeat the same process according to number of assets 
-        for(int i=1; i<count_asset; i++)
-        {   
-            swapped == 0; 
-
-            for(int j=1; j<count_asset; j++)
-            {   
-
-                //check if the last price is bigger than the current one 
-                if ((ptr_assets[j-1]).price > (ptr_assets[j]).price) 
-                {   
-                    //if true, swap between the two assets
-                    swap_asset_details(ptr_assets, j); 
-                    swapped = 1; 
-                }
-
-            
-            }
-
-            //stop comparing when there are no swaps in the thing at any round.
-            if (swapped == 0){
-                break; 
-            }
-        }
-        
+        insertion_sort(ptr_assets, count_asset, 1); 
         cout << "\nPrices sorted ascending: \n"; 
     }
-    //view all assets
+    
     else if (choice == 2){
 
-        //repeat the same process according to number of assets 
-        for(int i=1; i<count_asset; i++)
-        {   
-            swapped == 0; 
-
-            for(int j=1; j<count_asset; j++)
-            {   
-
-                //check if the last price is lower than the current one 
-                if ((ptr_assets[j-1]).price < (ptr_assets[j]).price) 
-                {   
-                    //if true, swap between the two assets
-                    swap_asset_details(ptr_assets, j); 
-                    swapped = 1; 
-                }
-
-            
-            }
-
-            //stop comparing when there are no swaps in the thing at any round.
-            if (swapped == 0){
-                break; 
-            }
-        }
-        
-        
-        cout << "\nPrices sorted descending: \n"; 
+       insertion_sort(ptr_assets, count_asset, 2); 
+       cout << "\nPrices sorted descending: \n"; 
     }
 
 
@@ -779,10 +705,10 @@ void file_controller(Asset* ptr_assets, int &count_asset){
      //this function sorts assets according to their prices
 
     //var declaration
-    const string TRY_AGAIN_ASSET = "\nInput Choice: ";
+    //const string TRY_AGAIN_ASSET = "\nInput Choice: ";
     short sub_option; 
     cout << LINES; 
-    cout << "Do you want to write to file (Type '1') or write from file ('Type 2')? : " << endl;
+    cout << "Do you want to save to file (Type '1') or load from file ('Type 2')? : " << endl;
     
     
     while (true){
@@ -792,7 +718,7 @@ void file_controller(Asset* ptr_assets, int &count_asset){
         
         if (sub_option == 1){
             
-            cout << "\nReading to file...\n"; 
+            cout << "\nSaving to file...\n"; 
             save_asset_file(ptr_assets, count_asset); 
             break; 
         }
@@ -826,12 +752,12 @@ void save_asset_file(Asset* ptr_assets, int &count_asset) {
 
         }
         
-        cout << "\n\t\t\t\t==Success!==" << endl;
+        cout << "\n\t\t\t\t==Saved to file Successfully!==" << endl;
         file.close();
     }
     else {
         
-        cout << "\n\t\t\t\t==FAILED writing to file==" << endl;
+        cout << "\n\t\t\t\t==FAILED saving to file==" << endl;
     }
 
 }
@@ -849,11 +775,11 @@ void load_asset_file(Asset* ptr_assets, int &count_asset) {
             file.read((char*)&asset, sizeof(asset));
             count_asset++;
         }
-        cout << "\n\t\t\t\t==Success!==" << endl;
+        cout << "\n\t\t\t\t==Loaded from file successfully!==" << endl;
         file.close();
     }
     else {
-        cout << "\n\t\t\t\t==FAILED reading from file.==" << endl;
+        cout << "\n\t\t\t\t==FAILED loading from file.==" << endl;
     }
 }
 
@@ -863,6 +789,63 @@ void load_asset_file(Asset* ptr_assets, int &count_asset) {
 
 
 /************************************************HELPER FUNCTIONS****************************************************/ 
+void insertion_sort(Asset* ptr_assets, int &count_asset, int key){
+
+    short swapped = 0; 
+    for(int i=1; i<count_asset; i++)
+        {   
+            swapped = 0; 
+
+            for(int j=1; j<count_asset; j++)
+            {   
+                //sort name alphabetically
+                if (key == 0){
+                //check if the name of the last name is alphabetically after the next name
+                    if ((((ptr_assets[j-1]).name).compare((ptr_assets[j]).name))>0)
+                    {   
+                        //if true, swap between the two assets
+
+                        
+                        //other details
+                        swap_asset_details(ptr_assets, j); 
+                        swapped = 1; 
+                    }
+                
+                //sort price ascending
+                } else if (key == 1){
+
+                      //check if the last price is bigger than the current one 
+                    if ((ptr_assets[j-1]).price > (ptr_assets[j]).price) 
+                    {   
+                        //if true, swap between the two assets
+                        swap_asset_details(ptr_assets, j); 
+                        swapped = 1; 
+                    }
+                } 
+
+                //sort price descending
+
+                else if (key == 2){
+                    
+                      //check if the last price is bigger than the current one 
+                    if ((ptr_assets[j-1]).price < (ptr_assets[j]).price) 
+                    {   
+                        //if true, swap between the two assets
+                        swap_asset_details(ptr_assets, j); 
+                        swapped = 1; 
+                    }
+                } 
+
+
+            
+            }
+
+            //stop comparing when there are no swaps in the thing at any round.
+            if (swapped == 0){
+                break; 
+            }
+        }
+}
 void swap_asset_details(Asset* ptr_assets, int index){
 
     double temp; 
@@ -902,14 +885,17 @@ void swap_asset_details(Asset* ptr_assets, int index){
 }
 
 
-double get_valid_input(string try_again){   
+double get_valid_input(short try_again){   
     
     //this function handles wrong input type(besides numbers), letters before numbers, numbers over 32767 and show user feedback
     //caveat: numbers before letters will take the numbers in front 
+    //it returns a double to cover cases for floating point such as price
     double choice;
+
+    string msg = ask_user_update(try_again); 
     while (true)
     {
-        cout << endl << try_again;  
+        cout << endl << msg;  
         cin >> choice;
         if (cin.fail()) 
         {
@@ -930,15 +916,16 @@ double get_valid_input(string try_again){
     return choice;
 }
 
-short get_valid_input(string try_again, short max_num){
+short get_valid_input(short try_again, short max_num){
 
     //this function handles wrong input type(besides numbers), letters before numbers, numbers over 32767 and show user feedback
     //it also handles numbers specified in max_num to get a valid date input from user
     //caveat: numbers before letters will take the numbers in front 
     short choice;
+    string msg = ask_user_update(try_again); 
     while (true)
     {
-        cout << endl << try_again;  
+        cout << endl << msg;  
         cin >> choice;
         if (cin.fail()) 
         {
@@ -964,7 +951,7 @@ short get_valid_input(string try_again, short max_num){
 
 void print_one_asset(Asset* ptr_assets, int found_index){
     
-    //this function prints one asset's detail  
+    //this function prints one asset's detail 
     
     int ID = (ptr_assets[found_index]).ID;
     string name = (ptr_assets[found_index]).name;
@@ -987,12 +974,14 @@ void print_one_asset(Asset* ptr_assets, int found_index){
 
 void print_all_asset(Asset* ptr_assets, int &count_asset){
 
-    //this function prints all assets in list
-    //headings
+    //this function prints all assets by taking pointer to assets and total number of assets
+    
+    //print headings
     cout << "\nAll assets list\n"; 
     cout << LINES; 
     cout << ASSET_COL_NAMES; 
 
+    //print assets
     for (int i = 0; i < count_asset; i++){
         
         //output each asset 
@@ -1060,6 +1049,24 @@ bool isNumeric(string str) {
 /////COPIED FROM https://www.tutorialspoint.com/how-to-check-if-input-is-numeric-in-cplusplus///
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
+string ask_user_update(short info_asked){
+
+    if (info_asked == ASK_PRICE) {
+        return "Enter NEW Asset price: "; 
+    } else if (info_asked == ASK_QUANTITY) {
+        return "Enter NEW Asset purchase quantity: "; 
+    } else if (info_asked == ASK_DAY) {
+        return "Enter NEW Asset purchase day: "; 
+    } else if (info_asked == ASK_MONTH) {
+        return "Enter NEW Asset purchase month: "; 
+    } else if (info_asked == ASK_YEAR) {
+        return "Enter NEW Asset purchase year: "; 
+    } else if (info_asked == TRY_AGAIN_ASSET){
+        return "\nInput Choice: "; 
+    }
+ 
+    return "Error."; 
+}
 
 
 void ClearScreen()
