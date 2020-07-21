@@ -569,6 +569,8 @@ void update_asset(Asset* ptr_assets, int &count_asset, int found_index){
 /**********************************************SORT ASSETS***********************************************************/
 void sort_controller(Asset* ptr_assets, int &count_asset){
 
+    //this function is the controller for sort asset function of app
+
     //var declaration
     
     short sub_option; 
