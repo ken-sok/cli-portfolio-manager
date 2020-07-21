@@ -63,10 +63,8 @@ int delete_asset_controller(Asset* ptr_assets, int &count_asset);
 void update_asset_controller(Asset* ptr_assets, int &count_asset);
 void update_asset(Asset* ptr_assets, int &count_asset, int found_index); 
 void swap_asset_details(Asset* ptr_assets, int index); 
-void sort_controller(Asset* ptr_assets, int &count_asset); 
-void sort_name_controller(Asset* ptr_assets, int &count_asset); 
+void sort_controller(Asset* ptr_assets, int &count_asset);  
 void sort_prices_controller(Asset* ptr_assets, int &count_asset); 
-void sort_prices(short choice, Asset* ptr_assets, int &count_asset);
 void insertion_sort(Asset* ptr_assets, int &count_asset, int key); 
 void save_asset_file(Asset* ptr_assets, int &count_asset); 
 void load_asset_file(Asset* ptr_assets, int &count_asset); 
@@ -584,13 +582,18 @@ void sort_controller(Asset* ptr_assets, int &count_asset){
         
         //sort names
         if (sub_option == 1){
-            sort_name_controller(ptr_assets, count_asset); 
+            
+            insertion_sort(ptr_assets, count_asset, 0); 
+            cout << "\n---NAMES SORTED ALPHABETICALLY!---\n";  
+            
             break; 
         }
 
         //sort prices
         else if (sub_option == 2){
+            
             sort_prices_controller(ptr_assets, count_asset); 
+
             break; 
         } else {
             cout << endl << INVALID_MSG << LINES; 
@@ -600,23 +603,8 @@ void sort_controller(Asset* ptr_assets, int &count_asset){
 
     }
 
-
-}
-
-
-void sort_name_controller(Asset* ptr_assets, int &count_asset){
-
-    //this function is a model to sort records according to their name alphabetically
-
-    string temp; 
-    short swapped = 0; 
-
-    //sort according to name
-    insertion_sort(ptr_assets, count_asset, 0); 
-    cout << "\n---NAMES SORTED ALPHABETICALLY!---\n"; 
     print_all_asset(ptr_assets, count_asset); 
 
-    
 }
 
 
@@ -637,13 +625,15 @@ void sort_prices_controller(Asset* ptr_assets, int &count_asset){
         
         //ascending 
         if (sub_option == 1){
-            sort_prices(1,ptr_assets, count_asset); 
+            insertion_sort(ptr_assets, count_asset, 1); 
+            cout << "\n---PRICES SORTED ASCENDING---\n"; 
             break; 
         }
 
         //descending
         else if (sub_option == 2){
-            sort_prices(2,ptr_assets, count_asset);  
+            insertion_sort(ptr_assets, count_asset, 2); 
+            cout << "\n---PRICE SORTED DESCENDING---\n";   
             break; 
         } else {
             cout << endl << INVALID_MSG << LINES; 
@@ -655,29 +645,8 @@ void sort_prices_controller(Asset* ptr_assets, int &count_asset){
 
 }
 
-void sort_prices(short choice, Asset* ptr_assets, int &count_asset){
+ 
 
-    //this function is controller for sorting prices 
-
-    short swapped = 0; 
-    if (choice == 1){
-       
-        insertion_sort(ptr_assets, count_asset, 1); 
-        cout << "\n---PRICES SORTED ASCENDING---\n"; 
-    }
-    
-    else if (choice == 2){
-
-       insertion_sort(ptr_assets, count_asset, 2); 
-       cout << "\n---PRICE SORTED DESCENDING---\n"; 
-    }
-
-
-    //print all assets
-    print_all_asset(ptr_assets, count_asset); 
-
-    
-}
 /**********************************************SORT ASSETS***********************************************************/
 
 /**********************************************FILE I/O***********************************************************/
@@ -750,6 +719,7 @@ void save_asset_file(Asset* ptr_assets, int &count_asset) {
 void load_asset_file(Asset* ptr_assets, int &count_asset) {
 
     //this function loads all assets data from file 
+
     fstream file;
     Asset asset;
     file.open("AssetsData.bin", ios::in | ios::binary);
@@ -777,7 +747,7 @@ void load_asset_file(Asset* ptr_assets, int &count_asset) {
 /************************************************HELPER FUNCTIONS****************************************************/ 
 void insertion_sort(Asset* ptr_assets, int &count_asset, int key){
 
-    //this functions utilises insertion sort algorithm to sort names, and prices
+    //this functions utilises insertion sort algorithm to sort names, and prices of asset
 
     short swapped = 0; 
     for(int i=1; i<count_asset; i++)
@@ -882,6 +852,7 @@ double get_valid_input(short try_again){
     //this function handles wrong input type(besides numbers), letters before numbers, numbers over 32767 and show user feedback
     //caveat: numbers before letters will take the numbers in front 
     //it returns a double to cover cases for floating point such as price
+
     double choice;
 
     string msg = ask_user_update(try_again); 
@@ -913,6 +884,7 @@ short get_valid_input(short try_again, short max_num){
     //this function handles wrong input type(besides numbers), letters before numbers, numbers over 32767 and show user feedback
     //it also handles numbers specified in max_num to get a valid date input from user
     //caveat: numbers before letters will take the numbers in front 
+    
     short choice;
     string msg = ask_user_update(try_again); 
     while (true)
