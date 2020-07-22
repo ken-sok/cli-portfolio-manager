@@ -368,13 +368,22 @@ void insert_asset(Asset* ptr_assets, int &count_asset){
     //var declaration
    
     static int ID = count_asset + 1;
+    string name; 
 
     //get user input for asset details
     cout << "Please type in new asset details below." << endl;
     ptr_assets[count_asset].ID = ID;
     cout << "ID = " << ID << endl; 
     cout << "\nEnter Asset name: ";
-    cin >> ptr_assets[count_asset].name;    
+
+    //ignore new line character from previous line
+    while (name.length()==0){
+        getline(cin, name);    
+    } 
+        
+
+    ptr_assets[count_asset].name = name; 
+
     ptr_assets[count_asset].price = get_valid_input(ASK_PRICE);
     ptr_assets[count_asset].quantity = get_valid_input(ASK_QUANTITY);  
     ptr_assets[count_asset].date.day = get_valid_input(ASK_DAY, 31);  
@@ -540,12 +549,22 @@ void update_asset(Asset* ptr_assets, int &count_asset, int found_index){
 
     //this function allows user to update one asset according to the index specified in its controller function
 
-    
+    //var declaration
+    string name; 
+
     //get user input
     cout << "Please type in new asset details below." << endl;
     cout << "ID = " << ptr_assets[found_index].ID << endl; 
+
     cout << "\nEnter NEW Asset name: ";
-    cin >> ptr_assets[found_index].name;
+    
+    while (name.length()==0){
+        getline(cin, name);    
+    }
+    
+    ptr_assets[found_index].name = name; 
+    
+    //cin >> ptr_assets[found_index].name;
     ptr_assets[found_index].price = get_valid_input(ASK_PRICE);
     ptr_assets[found_index].quantity = get_valid_input(ASK_QUANTITY);  
     ptr_assets[found_index].date.day = get_valid_input(ASK_DAY, 31);  
@@ -928,7 +947,7 @@ void print_one_asset(Asset* ptr_assets, int found_index){
     cout << LINES; 
     cout << ASSET_COL_NAMES; 
     cout << endl; 
-    cout << ID << "\t" << name << "\t\t\t" << price << "\t\t" << quantity << "\t\t" << day << "/" << month << "/"<< year ; 
+    cout << ID << "\t" << name << "\t\t" << price << "\t\t" << quantity << "\t\t" << day << "/" << month << "/"<< year ; 
     cout << endl;
     cout << LINES; 
 
@@ -957,7 +976,7 @@ void print_all_asset(Asset* ptr_assets, int &count_asset){
         int month = (ptr_assets[i]).date.month;
         int year = (ptr_assets[i]).date.year;
         cout << endl; 
-        cout << new_ID << "\t" << name << "\t\t\t" << price << "\t\t" << quantity << "\t\t" << day << "/" << month << "/"<< year;
+        cout << new_ID << "\t" << name << "\t\t" << price << "\t\t" << quantity << "\t\t" << day << "/" << month << "/"<< year;
 
     }
 
