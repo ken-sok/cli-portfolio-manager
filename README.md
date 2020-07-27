@@ -6,3 +6,12 @@ Function: Create, Read, Update, Delete, Search and Sort portfolio and/or asset i
 Language used: 
 - C++
 
+
+## Planned updates for later
+
+- manage assets according to portfolio
+- user login & authentication
+- GUI 
+- other assets details 
+
+
