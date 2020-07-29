@@ -241,12 +241,6 @@ int assets_manage(){
                     break;
                     
                 }
-            
-            case Exit: 
-                {
-                    cout << "\nThank you for using Portfolio Manager!\n"; 
-                    break; 
-                }
 
 
             default:
